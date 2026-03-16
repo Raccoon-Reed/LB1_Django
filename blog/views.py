@@ -78,12 +78,24 @@ def category_list(request):
 
 def category_detail(request, slug):
     category = get_object_or_404(Category, slug=slug)
+
+    sort = request.GET.get('sort', 'newest')
+
     articles = Article.objects.filter(
         category=category, is_published=True
     ).select_related('author').annotate(comment_count=Count('comments'))
+
+    if sort == 'oldest':
+        articles = articles.order_by('created_at')
+    elif sort == 'comments':
+        articles = articles.order_by('-comment_count')
+    else:
+        articles = articles.order_by('-created_at')
+
     return render(request, 'blog/category_detail.html', {
         'category': category,
         'articles': articles,
+        'current_sort': sort,
     })
 
 
