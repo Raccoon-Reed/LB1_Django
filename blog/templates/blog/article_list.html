@@ -1,0 +1,117 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Всі статті{% endblock %}
+
+{% block content %}
+<style>
+    .page-header { margin-bottom: 30px; }
+    .page-header h2 { font-size: 2rem; color: #2c3e50; margin-bottom: 6px; }
+    .page-header p { color: #7f8c8d; }
+
+    .sort-bar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        background: white;
+        padding: 14px 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .sort-bar .sort-label { font-size: 0.9rem; color: #7f8c8d; font-weight: 600; }
+    .sort-group { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .sort-group-label {
+        font-size: 0.75rem; color: #aaa; text-transform: uppercase;
+        letter-spacing: 0.05em; padding: 0 4px;
+    }
+    .sort-btn {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 7px 16px; border-radius: 8px; text-decoration: none;
+        font-size: 0.88rem; font-weight: 500;
+        border: 2px solid #e0e0e0; background: white; color: #555;
+        transition: all 0.18s; white-space: nowrap;
+    }
+    .sort-btn:hover { border-color: #3498db; color: #3498db; background: #eaf4fd; }
+    .sort-btn.active { border-color: #3498db; background: #3498db; color: white; }
+    .sort-divider { width: 1px; height: 28px; background: #e0e0e0; margin: 0 6px; }
+
+    .articles-list { display: flex; flex-direction: column; gap: 16px; }
+    .article-card {
+        background: white; border-radius: 12px; padding: 25px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        transition: transform 0.15s, box-shadow 0.15s;
+        border-left: 4px solid transparent;
+    }
+    .article-card:hover {
+        transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+        border-left-color: #3498db;
+    }
+    .article-card .cat-tag {
+        display: inline-block; background: #eaf4fd; color: #2980b9;
+        border-radius: 6px; padding: 2px 10px; font-size: 0.78rem;
+        font-weight: 600; margin-bottom: 10px;
+    }
+    .article-card h3 { color: #2c3e50; font-size: 1.15rem; margin-bottom: 10px; }
+    .article-card p { color: #7f8c8d; font-size: 0.95rem; line-height: 1.6; }
+    .article-meta {
+        display: flex; gap: 18px; margin-top: 14px;
+        font-size: 0.82rem; color: #aaa; flex-wrap: wrap;
+    }
+    .article-meta .highlight { color: #3498db; font-weight: 600; }
+</style>
+
+<div class="page-header">
+    <h2>📰 Всі статті</h2>
+    <p>Знайдено статей: <strong>{{ articles.count }}</strong></p>
+</div>
+
+<!-- Панель сортування -->
+<div class="sort-bar">
+    <span class="sort-label">🔀 Сортування:</span>
+
+    <div class="sort-group">
+        <span class="sort-group-label">📅 За датою</span>
+        <a href="?sort=date_desc" class="sort-btn {% if current_sort == 'date_desc' %}active{% endif %}">
+            ↓ Спочатку нові
+        </a>
+        <a href="?sort=date_asc" class="sort-btn {% if current_sort == 'date_asc' %}active{% endif %}">
+            ↑ Спочатку старі
+        </a>
+    </div>
+
+    <div class="sort-divider"></div>
+
+    <div class="sort-group">
+        <span class="sort-group-label">💬 За коментарями</span>
+        <a href="?sort=comments_desc" class="sort-btn {% if current_sort == 'comments_desc' %}active{% endif %}">
+            ↓ Більше коментарів
+        </a>
+        <a href="?sort=comments_asc" class="sort-btn {% if current_sort == 'comments_asc' %}active{% endif %}">
+            ↑ Менше коментарів
+        </a>
+    </div>
+</div>
+
+<div class="articles-list">
+    {% for article in articles %}
+    <div class="article-card">
+        <span class="cat-tag">{{ article.category.name }}</span>
+        <h3>{{ article.title }}</h3>
+        <p>{{ article.content|truncatewords:30 }}</p>
+        <div class="article-meta">
+            <span>📅 {{ article.created_at|date:"d.m.Y" }}</span>
+            <span>
+                💬
+                {% if article.comment_count > 0 %}
+                    <span class="highlight">{{ article.comment_count }}</span>
+                {% else %}0{% endif %}
+                {% if article.comment_count == 1 %}коментар
+                {% elif article.comment_count >= 2 and article.comment_count <= 4 %}коментарі
+                {% else %}коментарів{% endif %}
+            </span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'blog/base.html' %}
+{% block title %}{{ action }}{% endblock %}
+{% block content %}
+<style>
+    .form-wrap { max-width: 720px; margin: 0 auto; }
+    .form-card { background: white; border-radius: 14px; padding: 40px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+    .form-card h2 { font-size: 1.6rem; color: #2c3e50; margin-bottom: 24px; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-size: 0.88rem; font-weight: 600; color: #555; margin-bottom: 6px; }
+    .form-group input[type=text], .form-group textarea, .form-group select {
+        width: 100%; padding: 11px 14px; border: 1.5px solid #ddd; border-radius: 8px;
+        font-size: 0.95rem; font-family: inherit; transition: border 0.2s;
+    }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: #3498db; }
+    .form-group textarea { resize: vertical; }
+    .form-check { display: flex; align-items: center; gap: 10px; }
+    .form-check input[type=checkbox] { width: 18px; height: 18px; }
+    .actions { display: flex; gap: 12px; margin-top: 28px; }
+    .btn-save { padding: 12px 28px; background: linear-gradient(135deg, #2c3e50, #3498db); color: white; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; }
+    .btn-save:hover { opacity: 0.9; }
+    .btn-cancel { padding: 12px 22px; background: #f0f0f0; color: #555; border-radius: 8px; text-decoration: none; font-size: 0.95rem; font-weight: 600; }
+    .errorlist { color: #e74c3c; font-size: 0.82rem; list-style: none; margin-top: 4px; }
+</style>
+
+<div class="form-wrap">
+    <div class="form-card">
+        <h2>{{ action }}</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Заголовок *</label>
+                {{ form.title }}
+                {{ form.title.errors }}
+            </div>
+            <div class="form-group">
+                <label>Категорія *</label>
+                {{ form.category }}
+                {{ form.category.errors }}
+            </div>
+            <div class="form-group">
+                <label>Зміст *</label>
+                {{ form.content }}
+                {{ form.content.errors }}
+            </div>
+            <div class="form-group">
+                <div class="form-check">
+                    {{ form.is_published }}
+                    <label for="{{ form.is_published.id_for_label }}">Опублікувати статтю</label>
+                </div>
+            </div>
+            <div class="actions">
+                <button type="submit" class="btn-save">💾 Зберегти</button>
+                {% if article %}
+                    <a href="{% url 'blog:article_detail' article.pk %}" class="btn-cancel">Скасувати</a>
+                {% else %}
+                    <a href="/" class="btn-cancel">Скасувати</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

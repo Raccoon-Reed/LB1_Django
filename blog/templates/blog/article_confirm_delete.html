@@ -1,0 +1,31 @@
+{% extends 'blog/base.html' %}
+{% block title %}Видалити статтю{% endblock %}
+{% block content %}
+<style>
+    .confirm-wrap { max-width: 500px; margin: 0 auto; text-align: center; }
+    .confirm-card { background: white; border-radius: 14px; padding: 40px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+    .icon { font-size: 3rem; margin-bottom: 16px; }
+    h2 { color: #2c3e50; margin-bottom: 10px; }
+    p { color: #7f8c8d; margin-bottom: 24px; font-size: 0.95rem; }
+    .article-title { font-weight: 700; color: #e74c3c; font-size: 1.05rem; }
+    .actions { display: flex; gap: 12px; justify-content: center; }
+    .btn-del { padding: 12px 28px; background: #e74c3c; color: white; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; }
+    .btn-cancel { padding: 12px 22px; background: #f0f0f0; color: #555; border-radius: 8px; text-decoration: none; font-size: 0.95rem; font-weight: 600; }
+</style>
+<div class="confirm-wrap">
+    <div class="confirm-card">
+        <div class="icon">🗑️</div>
+        <h2>Видалити статтю?</h2>
+        <p>Ви дійсно хочете видалити статтю<br>
+        <span class="article-title">«{{ article.title }}»</span>?<br>
+        Цю дію неможливо скасувати.</p>
+        <div class="actions">
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn-del">Так, видалити</button>
+            </form>
+            <a href="{% url 'blog:article_detail' article.pk %}" class="btn-cancel">Скасувати</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

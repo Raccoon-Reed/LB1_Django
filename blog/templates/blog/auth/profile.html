@@ -1,0 +1,93 @@
+{% extends 'blog/base.html' %}
+{% block title %}Профіль — {{ user.username }}{% endblock %}
+{% block content %}
+<style>
+    .profile-grid { display: grid; grid-template-columns: 300px 1fr; gap: 24px; }
+    .profile-card { background: white; border-radius: 14px; padding: 30px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+    .avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #2c3e50, #3498db); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white; margin-bottom: 16px; }
+    .profile-name { font-size: 1.3rem; font-weight: 700; color: #2c3e50; }
+    .profile-username { color: #7f8c8d; font-size: 0.9rem; margin-bottom: 16px; }
+    .role-badge { display: inline-block; border-radius: 20px; padding: 5px 16px; font-size: 0.85rem; font-weight: 600; margin-bottom: 16px; }
+    .role-reader { background: #eee; color: #555; }
+    .role-author { background: #d4edda; color: #155724; }
+    .role-moderator { background: #cce5ff; color: #004085; }
+    .role-admin { background: #f8d7da; color: #721c24; }
+    .profile-info { font-size: 0.9rem; color: #555; border-top: 1px solid #f0f0f0; padding-top: 16px; margin-top: 8px; }
+    .profile-info div { margin-bottom: 8px; }
+    .profile-info span { color: #aaa; font-size: 0.82rem; display: block; }
+    .articles-card h3 { font-size: 1.2rem; color: #2c3e50; margin-bottom: 16px; }
+    .article-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #f0f0f0; }
+    .article-row:last-child { border-bottom: none; }
+    .article-row a { color: #2c3e50; text-decoration: none; font-weight: 500; }
+    .article-row a:hover { color: #3498db; }
+    .art-meta { font-size: 0.8rem; color: #aaa; }
+    .art-actions { display: flex; gap: 8px; }
+    .btn-sm { padding: 5px 12px; border-radius: 6px; font-size: 0.82rem; text-decoration: none; font-weight: 600; }
+    .btn-edit { background: #eaf4fd; color: #2980b9; }
+    .btn-del { background: #fdecea; color: #c0392b; }
+    .empty { color: #aaa; text-align: center; padding: 30px; }
+    @media(max-width:700px){ .profile-grid{ grid-template-columns:1fr; } }
+</style>
+
+<div class="profile-grid">
+    <div>
+        <div class="profile-card">
+            <div class="avatar">{{ user.username|first|upper }}</div>
+            <div class="profile-name">
+                {% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.username }}{% endif %}
+            </div>
+            <div class="profile-username">@{{ user.username }}</div>
+
+            {% if user.is_superuser %}
+                <span class="role-badge role-admin">👑 Superuser</span>
+            {% elif user.is_staff %}
+                <span class="role-badge role-admin">🔧 Адміністратор</span>
+            {% elif profile.role == 'moderator' %}
+                <span class="role-badge role-moderator">🛡️ Модератор</span>
+            {% elif profile.role == 'author' %}
+                <span class="role-badge role-author">✏️ Автор</span>
+            {% else %}
+                <span class="role-badge role-reader">👁️ Читач</span>
+            {% endif %}
+
+            <div class="profile-info">
+                <div>
+                    <span>Email</span>
+                    {{ user.email|default:"—" }}
+                </div>
+                <div>
+                    <span>Зареєстрований</span>
+                    {{ user.date_joined|date:"d.m.Y" }}
+                </div>
+                <div>
+                    <span>Статей написано</span>
+                    {{ user_articles.count }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="profile-card articles-card">
+        <h3>📄 Мої статті</h3>
+        {% if user_articles %}
+            {% for article in user_articles %}
+            <div class="article-row">
+                <div>
+                    <a href="{% url 'blog:article_detail' article.pk %}">{{ article.title }}</a>
+                    <div class="art-meta">
+                        {{ article.category.name }} · {{ article.created_at|date:"d.m.Y" }}
+                        {% if not article.is_published %} · <span style="color:#e74c3c">Чернетка</span>{% endif %}
+                    </div>
+                </div>
+                <div class="art-actions">
+                    <a href="{% url 'blog:article_edit' article.pk %}" class="btn-sm btn-edit">Редагувати</a>
+                    <a href="{% url 'blog:article_delete' article.pk %}" class="btn-sm btn-del">Видалити</a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty">📭 Ви ще не написали жодної статті.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

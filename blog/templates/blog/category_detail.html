@@ -1,0 +1,93 @@
+{% extends 'blog/base.html' %}
+{% block title %}{{ category.name }} — Статті{% endblock %}
+{% block content %}
+<style>
+    .breadcrumb { font-size: 0.9rem; color: #7f8c8d; margin-bottom: 20px; }
+    .breadcrumb a { color: #3498db; text-decoration: none; }
+
+    .category-hero { background: linear-gradient(135deg, #2c3e50, #3498db); color: white; border-radius: 14px; padding: 32px; margin-bottom: 28px; }
+    .category-hero h2 { font-size: 1.8rem; margin-bottom: 8px; }
+    .category-hero p { opacity: 0.85; margin-bottom: 14px; }
+    .count-badge { background: rgba(255,255,255,0.2); border-radius: 20px; padding: 4px 16px; font-size: 0.88rem; display: inline-block; }
+
+    /* Сортування */
+    .sort-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    .sort-bar span { font-size: 0.88rem; color: #7f8c8d; font-weight: 600; }
+    .sort-btn { padding: 7px 18px; border-radius: 20px; text-decoration: none; font-size: 0.85rem; font-weight: 600; border: 2px solid #e0e0e0; color: #555; background: white; transition: all 0.2s; }
+    .sort-btn:hover { border-color: #3498db; color: #3498db; }
+    .sort-btn.active { background: #3498db; border-color: #3498db; color: white; }
+
+    .articles-list { display: flex; flex-direction: column; gap: 14px; }
+    .article-card { background: white; border-radius: 12px; padding: 22px 26px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; transition: transform 0.15s, box-shadow 0.15s; }
+    .article-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
+    .article-card h3 a { color: #2c3e50; text-decoration: none; font-size: 1.1rem; }
+    .article-card h3 a:hover { color: #3498db; }
+    .article-meta { color: #aaa; font-size: 0.82rem; margin-top: 6px; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+    .article-meta .comment-count { background: #f0f0f0; border-radius: 10px; padding: 2px 10px; font-size: 0.8rem; color: #666; }
+    .article-excerpt { color: #7f8c8d; font-size: 0.9rem; margin-top: 8px; line-height: 1.5; }
+    .art-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .btn-sm { padding: 6px 14px; border-radius: 6px; font-size: 0.8rem; text-decoration: none; font-weight: 600; white-space: nowrap; }
+    .btn-edit { background: #eaf4fd; color: #2980b9; }
+    .btn-del { background: #fdecea; color: #c0392b; }
+    .empty-state { text-align: center; padding: 60px 20px; background: white; border-radius: 14px; color: #aaa; }
+    .back-btn { display: inline-flex; align-items: center; gap: 6px; color: #3498db; text-decoration: none; font-weight: 600; margin-bottom: 24px; font-size: 0.95rem; }
+    .back-btn:hover { text-decoration: underline; }
+</style>
+
+<div class="breadcrumb"><a href="/">🏠 Головна</a> → {{ category.name }}</div>
+<a href="/" class="back-btn">← Всі категорії</a>
+
+<div class="category-hero">
+    <h2>📁 {{ category.name }}</h2>
+    {% if category.description %}<p>{{ category.description }}</p>{% endif %}
+    <span class="count-badge">📄 {{ articles.count }} статей</span>
+</div>
+
+<!-- Панель сортування -->
+<div class="sort-bar">
+    <span>🔀 Сортування:</span>
+    <a href="?sort=newest" class="sort-btn {% if current_sort == 'newest' %}active{% endif %}">
+        📅 Новіші спочатку
+    </a>
+    <a href="?sort=oldest" class="sort-btn {% if current_sort == 'oldest' %}active{% endif %}">
+        🕰️ Старіші спочатку
+    </a>
+    <a href="?sort=comments" class="sort-btn {% if current_sort == 'comments' %}active{% endif %}">
+        💬 За коментарями
+    </a>
+</div>
+
+{% if articles %}
+    <div class="articles-list">
+        {% for article in articles %}
+        <div class="article-card">
+            <div style="flex:1;">
+                <h3><a href="{% url 'blog:article_detail' article.pk %}">{{ article.title }}</a></h3>
+                <div class="article-meta">
+                    <span>📅 {{ article.created_at|date:"d.m.Y" }}</span>
+                    {% if article.author %}
+                        <span>✍️ {{ article.author.get_full_name|default:article.author.username }}</span>
+                    {% endif %}
+                    <span class="comment-count">💬 {{ article.comment_count }} коментарів</span>
+                </div>
+                <p class="article-excerpt">{{ article.content|truncatewords:20 }}</p>
+            </div>
+            {% if user.is_authenticated %}
+                {% if user == article.author or user.is_staff %}
+                <div class="art-actions">
+                    <a href="{% url 'blog:article_edit' article.pk %}" class="btn-sm btn-edit">✏️ Ред.</a>
+                    <a href="{% url 'blog:article_delete' article.pk %}" class="btn-sm btn-del">🗑️</a>
+                </div>
+                {% endif %}
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <div style="font-size:3rem;margin-bottom:12px;">📭</div>
+        <p>У цій категорії ще немає статей.</p>
+    </div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,22 @@
+[
+  {
+    "model": "blog.category",
+    "pk": 1,
+    "fields": { "name": "Технології", "slug": "tekhnolohii", "description": "Новини зі світу технологій" }
+  },
+  {
+    "model": "blog.category",
+    "pk": 2,
+    "fields": { "name": "Наука", "slug": "nauka", "description": "Наукові новини з усього світу" }
+  },
+  {
+    "model": "blog.category",
+    "pk": 3,
+    "fields": { "name": "Спорт", "slug": "sport", "description": "Футбол, баскетбол та інші події" }
+  },
+  {
+    "model": "blog.category",
+    "pk": 4,
+    "fields": { "name": "Культура", "slug": "kultura", "description": "Мистецтво, кіно, музика" }
+  }
+]
