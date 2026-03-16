@@ -1,3 +1,5 @@
+На захист
+
 # 1. Створити суперкористувача (адміна)
 python manage.py createsuperuser
 
