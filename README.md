@@ -4,4 +4,4 @@
 python manage.py createsuperuser
 
 2. Запустити сервер
-python manage.py runserve
+python manage.py runserver
